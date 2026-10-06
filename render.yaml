@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: caravanas-templo
+    runtime: docker
+    plan: starter          # disco persistente exige plano pago
+    envVars:
+      - key: ADMIN_PASSWORD
+        sync: false        # defina no painel do Render (senha forte)
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DB_PATH
+        value: /data/caravanas.db
+    disk:
+      name: dados
+      mountPath: /data
+      sizeGB: 1

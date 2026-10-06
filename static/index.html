@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Caravanas do Templo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Cormorant+Garamond:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--foto:url('https://content.churchofjesuschrist.org/templesldsorg/bc/Temples/photo-galleries/rio-de-janeiro-brazil/1280x800/1-001db7326e638032470a02813c9e47191ef74b0e.jpeg');--foto2:url('https://content.churchofjesuschrist.org/templesldsorg/bc/Temples/photo-galleries/rio-de-janeiro-brazil/1280x800/4-5aa85fb6f20a17f629302687710142328a707d4d.jpeg');--bg:#f4f5f7;--card:rgba(255,255,255,.72);--solid:#fff;--tx:#212529;--mut:#6c737b;--bd:#e3e6ea;--gold:#a39e72;--ac:#6b6638;--ac2:#a39e72;--soft:#f1efe3;--serif:'Cinzel','Trajan Pro',Georgia,serif;
+--verde:#1c9b5f;--amarelo:#e0a000;--vermelho:#d93d3d;--vazio:#e4e1d8;--sh:0 1px 2px rgba(20,30,50,.06),0 6px 20px rgba(20,30,50,.06)}
+@media(prefers-color-scheme:dark){:root{--bg:#0f131a;--card:rgba(18,22,30,.58);--solid:#171c26;--tx:#e8ebf2;--mut:#8f98aa;--bd:#262d3b;--ac:#cfc78e;--ac2:#a39e72;--soft:#262618;--vazio:#2b3343;--sh:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25)}}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(180deg,rgba(0,25,50,.05),rgba(0,25,50,.22)),var(--foto) center top/cover fixed,var(--bg);color:var(--tx);font:15px/1.5 "Noto Sans","Open Sans",-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+header{background:var(--card);border-bottom:1px solid var(--bd);padding:0 24px 0 168px;height:56px;display:flex;justify-content:space-between;align-items:center;gap:10px;position:sticky;top:0;z-index:5}
+header h1{margin:0;font:600 13px var(--serif);letter-spacing:2px;text-transform:uppercase;color:var(--tx)}
+header .who{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--mut)}
+.brand{position:absolute;top:0;left:24px;width:124px;background:var(--gold);color:#fff;z-index:6;text-align:center;padding:14px 8px 12px;box-shadow:0 4px 16px rgba(0,0,0,.18)}
+.brand svg{width:64px;height:auto;display:block;margin:0 auto 8px}
+.brand span{display:block;font:400 7.5px/1.5 var(--serif);letter-spacing:1px;text-transform:uppercase}
+.hero{height:clamp(300px,64vh,640px);background:var(--foto) center 12%/cover;position:relative}
+.hero .cap{position:absolute;right:20px;bottom:14px;color:#fff;font:italic 400 20px "Cormorant Garamond",Georgia,serif;text-shadow:0 1px 6px rgba(0,0,0,.6)}
+.band{background:color-mix(in srgb,var(--gold) 88%,transparent);backdrop-filter:blur(2px);color:#fff;text-align:center;padding:22px 20px}
+.band h2{margin:0;font:400 clamp(20px,3.4vw,30px)/1.3 var(--serif);letter-spacing:3px;text-transform:uppercase}
+.band p{margin:10px auto 0;max-width:560px;font:italic 400 19px "Cormorant Garamond",Georgia,serif}
+@media(max-width:700px){header{padding-left:112px}.brand{width:88px;left:12px}.brand svg{width:44px}.brand span{font-size:6px}header h1{font-size:11px;letter-spacing:1px}}
+footer{max-width:1000px;margin:10px auto 30px;padding:0 20px;font-size:12px;color:rgba(255,255,255,.85);text-shadow:0 1px 3px rgba(0,0,0,.6)}
+body.login{background:linear-gradient(180deg,rgba(0,25,50,.35),rgba(0,25,50,.75)),var(--foto2) center/cover fixed;min-height:100vh}
+body.login header,body.login .band{display:none}body.login footer{color:rgba(255,255,255,.8);position:fixed;bottom:0;left:0;right:0;margin:0 auto 12px}
+main{max-width:1000px;margin:0 auto;padding:0 16px 24px}
+button,input,select{font:inherit;padding:9px 13px;border-radius:10px;border:1px solid var(--bd);background:var(--solid);color:var(--tx);min-width:0}
+button{cursor:pointer;transition:.15s}button:hover{filter:brightness(.96)}
+button.p{background:var(--ac);color:#fff;border-color:var(--ac);font-weight:600}
+@media(prefers-color-scheme:dark){button.p{color:#1b1a10}}
+button.sm{padding:5px 10px;font-size:13px}
+input:focus,select:focus{outline:2px solid var(--ac2);outline-offset:0}
+.card,.tabs,header{backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:20px;margin-top:16px;box-shadow:var(--sh)}
+.card h2{font-size:15px;margin:0 0 12px;font-weight:650}
+.tabs{display:flex;gap:2px;margin:0 -16px;overflow-x:auto;background:var(--card);padding:0 16px;border-bottom:1px solid var(--bd)}
+.tab{font-family:var(--serif);letter-spacing:.5px;border:0;border-bottom:3px solid transparent;background:transparent;border-radius:0;padding:14px 18px;color:var(--mut);font-weight:600;white-space:nowrap;font-size:14px}
+.tab:hover{color:var(--tx);filter:none}.tab.on{color:var(--ac);border-bottom-color:var(--ac);background:transparent}
+.nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.nav strong{font-size:16px}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.dow{font-size:11px;color:var(--mut);text-align:center;font-weight:600;text-transform:uppercase}
+.day{background:color-mix(in srgb,var(--solid) 40%,transparent);border:1px solid var(--bd);border-radius:10px;min-height:92px;padding:5px 6px;cursor:pointer;display:flex;flex-direction:column;gap:3px;transition:.12s}
+.day:hover{border-color:var(--ac2);transform:translateY(-1px)}
+.day.off{visibility:hidden}.day.closed{opacity:.45;cursor:default;background:repeating-linear-gradient(45deg,var(--bg),var(--bg) 6px,var(--vazio) 6px,var(--vazio) 7px)}.day.sab{border-color:var(--ac2)}.day small{font-size:10px;color:var(--mut);line-height:1.1}.day.sel{outline:2px solid var(--ac);background:var(--soft)}
+.day b{font-size:12px;color:var(--mut)}
+.bar{height:11px;border-radius:6px;background:var(--vazio);font-size:9px;line-height:11px;color:#fff;padding-left:5px;font-weight:700}
+.verde{background:var(--verde)}.amarelo{background:var(--amarelo)}.vermelho{background:var(--vermelho)}
+.day.lv-verde{background:color-mix(in srgb,var(--verde) 16%,var(--card));border-color:var(--verde)}
+.day.lv-amarelo{background:color-mix(in srgb,var(--amarelo) 18%,var(--card));border-color:var(--amarelo)}
+.day.lv-vermelho{background:color-mix(in srgb,var(--vermelho) 18%,var(--card));border-color:var(--vermelho)}
+.meter{height:6px;border-radius:4px;background:var(--vazio);overflow:hidden}.meter>i{display:block;height:100%;border-radius:4px}
+.num{font-size:20px;font-weight:800;line-height:1}.num.verde{color:var(--verde);background:none}.num.amarelo{color:var(--amarelo);background:none}.num.vermelho{color:var(--vermelho);background:none}
+.badge{display:inline-block;font-size:11px;font-weight:700;padding:1px 8px;border-radius:99px;margin-right:6px;background:var(--soft);color:var(--ac)}.badge.ala{background:color-mix(in srgb,var(--amarelo) 22%,var(--card));color:var(--tx)}
+.leg{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--mut);margin-top:14px}
+.leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.row>input,.row>select{flex:1 1 150px}
+.li{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--bd)}
+.li:last-child{border:0}.mut{color:var(--mut)}.hide{display:none!important}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:color-mix(in srgb,var(--soft) 80%,transparent);border-radius:12px;padding:12px 14px}
+.stat b{display:block;font-size:24px;line-height:1.1;color:var(--ac)}.stat span{font-size:12px;color:var(--mut)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{font-size:11px;text-transform:uppercase;color:var(--mut);text-align:left;padding:8px;border-bottom:1px solid var(--bd)}
+td{padding:9px 8px;border-bottom:1px solid var(--bd)}td.n,th.n{text-align:right}
+.tw{overflow-x:auto}
+.pill{display:inline-block;padding:2px 9px;border-radius:99px;background:var(--soft);color:var(--ac);font-size:12px;font-weight:600}
+.hbar{height:8px;border-radius:4px;background:var(--ac2);min-width:2px}
+.ord{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;width:100%}
+.ord label{font-size:12px;color:var(--mut);display:block}.ord input{width:100%}
+#gate .row>*{flex:none}#gate{max-width:380px;margin:10vh 8vw 0 auto;padding:28px;background:rgba(255,255,255,.96);color:#212529}@media(prefers-color-scheme:dark){#gate{background:rgba(23,28,38,.94);color:#e8ebf2}}#gate .logo{font-family:var(--serif);font-size:12px;text-align:center;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut)}#gate h2{text-align:center;font:400 20px var(--serif);letter-spacing:2px;text-transform:uppercase;margin:6px 0 16px}
+@media(max-width:900px){#gate{margin:8vh auto 0}}
+@media(max-width:560px){.bar{font-size:0}.day{min-height:56px;padding:4px}.tab{padding:8px 11px}}
+</style>
+</head>
+<body>
+<div class="brand"><svg viewBox="0 0 120 120" fill="#fff" aria-hidden="true">
+  <circle cx="60" cy="6" r="2.6"/><path d="M57 9h6l-1 5h-4z"/>
+  <path d="M60 14l5.5 40h-11z"/><rect x="51" y="54" width="18" height="6"/>
+  <path d="M49 60h22l3 8H46z"/><rect x="46" y="68" width="28" height="14"/>
+  <path d="M22 84h76l-6-9H28z"/><rect x="20" y="84" width="80" height="26"/>
+  <path d="M16 84l6-8h4v8zM104 84l-6-8h-4v8z"/><rect x="14" y="110" width="92" height="4"/>
+  <g fill="#a39e72"><rect x="55" y="70" width="3" height="9" rx="1.5"/><rect x="62" y="70" width="3" height="9" rx="1.5"/>
+  <rect x="55.5" y="94" width="9" height="16" rx="4.5"/>
+  <g id="w"><rect x="26" y="90" width="3.4" height="9" rx="1.7"/><rect x="34" y="90" width="3.4" height="9" rx="1.7"/><rect x="42" y="90" width="3.4" height="9" rx="1.7"/></g>
+  <g transform="translate(34 0)"><use href="#w" x="0"/></g>
+  <g transform="translate(-6 0)"><rect x="76" y="90" width="3.4" height="9" rx="1.7"/><rect x="84" y="90" width="3.4" height="9" rx="1.7"/><rect x="92" y="90" width="3.4" height="9" rx="1.7"/></g></g>
+</svg><span>Santidade ao Senhor<br>A Casa do Senhor</span></div>
+<header>
+  <h1>Agenda de caravanas</h1>
+  <div class="who" id="auth"></div>
+</header>
+
+<div id="gate" class="card">
+  <div class="logo">Templo de Rio de Janeiro Brasil</div><h2>Agenda de caravanas</h2>
+  <div class="row" style="flex-direction:column">
+    <input id="u" placeholder="Usuário" autocomplete="username">
+    <input id="s" type="password" placeholder="Senha" autocomplete="current-password">
+    <button class="p" id="go">Entrar</button>
+  </div>
+  <div id="err" class="mut" style="margin-top:10px;text-align:center"></div>
+</div>
+
+<div class="band hide" id="band"><h2>Templo de Rio de Janeiro Brasil</h2><p>Agenda de caravanas · veja a ocupação do templo por sábado e turno antes de planejar a sua.</p></div>
+<main id="app" class="hide">
+  <div class="tabs" id="tabs"></div>
+
+  <section id="v-cal">
+    <div class="card" style="padding:12px 18px;margin-bottom:-4px"><strong id="ttl"></strong></div>
+    <div class="card">
+      <div class="nav"><button id="prev">←</button><strong id="mes"></strong><button id="next">→</button></div>
+      <div class="grid" id="dows"></div>
+      <div class="grid" id="cal" style="margin-top:6px"></div>
+      <div class="leg">
+        <span><i style="background:var(--verde)"></i>Tranquilo</span>
+        <span><i style="background:var(--amarelo)"></i>Movimentado</span>
+        <span><i style="background:var(--vermelho)"></i>Lotado</span>
+        <span><i style="background:var(--vazio)"></i>Fechado (segunda)</span><span id="cap"></span>
+      </div>
+    </div>
+    <div class="card hide" id="detalhe"></div>
+  </section>
+
+  <section id="v-lid" class="hide"></section>
+  <section id="v-est" class="hide"></section>
+  <section id="v-rel" class="hide"></section>
+  <section id="v-min" class="hide"></section>
+</main>
+<footer>Fotos do Templo de Rio de Janeiro Brasil: © Igreja de Jesus Cristo dos Santos dos Últimos Dias. Uso interno para organização de caravanas.</footer>
+
+<script>
+const $=s=>document.querySelector(s);
+const TN={manha:'Manhã',tarde:'Tarde'};
+let ref=new Date(); ref.setDate(1);
+let cal={dias:{},capacidade_turno:0}, sel=null, tab='manha';
+let sess=null;try{sess=JSON.parse(localStorage.getItem('sess')||'null')}catch(e){}
+const pad=n=>String(n).padStart(2,'0');
+const mesKey=()=>`${ref.getFullYear()}-${pad(ref.getMonth()+1)}`;
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const br=d=>d.split('-').reverse().join('/');
+const nomeMes=()=>{const t=ref.toLocaleDateString('pt-BR',{month:'long',year:'numeric'});return t[0].toUpperCase()+t.slice(1)};
+const isAdmin=()=>sess&&sess.role==='admin';
+const bdg=t=>`<span class="badge ${t}">${t==='ala'?'Ala':'Estaca'}</span>`;
+
+async function api(path,opt={},raw){
+  const h={'Content-Type':'application/json'};
+  if(sess)h.Authorization='Bearer '+sess.token;
+  const r=await fetch('/api'+path,{...opt,headers:h});
+  if(!r.ok){
+    const j=await r.json().catch(()=>({}));
+    if(r.status===401&&sess){sess=null;localStorage.removeItem('sess');render()}
+    throw new Error(typeof j.detail==='string'?j.detail:(Array.isArray(j.detail)&&j.detail[0]?String(j.detail[0].msg).replace(/^Value error, /,''):'Dados inválidos'));
+  }
+  return raw?r:r.json();
+}
+
+/* ---------- shell ---------- */
+function render(){
+  $('#gate').classList.toggle('hide',!!sess);
+  $('#app').classList.toggle('hide',!sess);
+  $('#band').classList.toggle('hide',!sess);
+  document.body.classList.toggle('login',!sess);
+  $('#auth').innerHTML=sess?`<span>${esc(isAdmin()?'Administrador':sess.origem)}</span><button id="out" class="sm">Sair</button>`:'';
+  if(!sess)return;
+  $('#out').onclick=()=>{sess=null;sel=null;tab='manha';localStorage.removeItem('sess');render()};
+  const tabs=[['manha','☀️ Manhã'],['tarde','🌙 Tarde'],...(isAdmin()?[['est','Unidades'],['rel','Relatório'],['lid','Líderes']]:[['min','Minhas caravanas']])];
+  $('#tabs').innerHTML=tabs.map(([k,n])=>`<button class="tab ${k===tab?'on':''}" data-t="${k}">${n}</button>`).join('');
+  document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{tab=b.dataset.t;render()});
+  const view=(tab==='manha'||tab==='tarde')?'cal':tab;
+  ['cal','est','rel','min','lid'].forEach(k=>$('#v-'+k).classList.toggle('hide',k!==view));
+  return ({cal:load,est:viewEst,rel:viewRel,min:viewMin,lid:viewLid})[view]();
+}
+
+async function doLogin(){try{
+  const r=await api('/login',{method:'POST',body:JSON.stringify({usuario:$('#u').value.trim(),senha:$('#s').value})});
+  $('#s').value='';$('#err').textContent='';sess=r;localStorage.setItem('sess',JSON.stringify(r));tab='manha';render();
+}catch(e){$('#err').textContent=e.message}}
+$('#go').onclick=doLogin;
+$('#s').onkeydown=e=>{if(e.key==='Enter')doLogin()};
+
+const monthNav=(fn)=>{$('#prev').onclick=()=>{ref.setMonth(ref.getMonth()-1);fn()};$('#next').onclick=()=>{ref.setMonth(ref.getMonth()+1);fn()}};
+const navHtml=()=>`<div class="nav"><button class="sm" data-m="-1">←</button><strong>${nomeMes()}</strong><button class="sm" data-m="1">→</button></div>`;
+function bindNav(root,fn){root.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{ref.setMonth(ref.getMonth()+ +b.dataset.m);fn()})}
+
+/* ---------- calendário (por turno) ---------- */
+async function load(){
+  $('#ttl').textContent=tab==='manha'?'☀️ Turno da manhã':'🌙 Turno da tarde';
+  $('#mes').textContent=nomeMes();
+  cal=await api('/calendario?mes='+mesKey());
+  $('#cap').textContent=`Capacidade de referência: ${cal.capacidade_turno}/turno`;
+  const first=ref.getDay(), n=new Date(ref.getFullYear(),ref.getMonth()+1,0).getDate();
+  let h='';
+  for(let i=0;i<first;i++)h+='<div class="day off"></div>';
+  for(let d=1;d<=n;d++){
+    const k=`${mesKey()}-${pad(d)}`, wd=new Date(ref.getFullYear(),ref.getMonth(),d).getDay(), x=cal.dias[k]&&cal.dias[k][tab];
+    if(wd===1){h+=`<div class="day closed"><b>${d}</b><small>Fechado</small></div>`;continue}
+    h+=`<div class="day ${wd===6?'sab':''} ${x&&x.total?'lv-'+x.nivel:''} ${k===sel?'sel':''}" data-d="${k}"><b>${d}</b>${x&&x.total?`<div class="num ${x.nivel}">${x.total}</div><div class="meter"><i class="${x.nivel}" style="width:${Math.min(100,x.total/cal.capacidade_turno*100)}%"></i></div><small>${x.com} com · ${x.sem} sem</small><small><b>${x.vagas}</b> vagas</small>`:'<div class="meter"></div>'}</div>`;
+  }
+  $('#cal').innerHTML=h;
+  document.querySelectorAll('.day[data-d]').forEach(e=>e.onclick=()=>{sel=e.dataset.d;load()});
+  showDia();
+}
+function showDia(){
+  const el=$('#detalhe');
+  if(!sel||sel.slice(0,7)!==mesKey()){el.classList.add('hide');return}
+  el.classList.remove('hide');
+  const x=(cal.dias[sel]&&cal.dias[sel][tab])||{total:0,com:0,sem:0,caravanas:[]};
+  const sab=new Date(sel+'T12:00').getDay()===6;
+  let h=`<h2>${br(sel)} — ${TN[tab]}</h2><div class="stats" style="margin-bottom:10px">
+   <div class="stat"><b>${x.total}</b><span>Total / ${cal.capacidade_turno}</span></div>
+   <div class="stat"><b>${x.vagas??cal.capacidade_turno}</b><span>Vagas restantes</span></div>
+   <div class="stat"><b>${x.com}</b><span>Com investidura</span></div>
+   <div class="stat"><b>${x.sem}</b><span>Sem investidura</span></div></div>`;
+  h+=x.caravanas.map(c=>`<div class="li"><span>${bdg(c.tipo)}${esc(c.origem)}${c.transporte?' · '+esc(c.transporte):''}</span><span class="mut">${c.com} com · ${c.sem} sem · <b>${c.pessoas}</b></span></div>`).join('')||'<div class="mut">Nenhuma caravana neste turno.</div>';
+  if(sess.role==='lider'){h+=sab?`<div class="row"><button class="p" onclick="abrirForm(null,'${sel}','${tab}')">+ Cadastrar minha caravana neste sábado</button></div>`:'<div class="mut" style="margin-top:10px;font-size:13px">Caravanas só podem ser cadastradas aos sábados.</div>'}
+  el.innerHTML=h;
+}
+monthNav(load);
+$('#dows').innerHTML=['D','S','T','Q','Q','S','S'].map(d=>`<div class="dow">${d}</div>`).join('');
+
+/* ---------- admin: estacas ---------- */
+async function viewEst(){
+  const lista=await api('/admin/unidades');
+  $('#v-est').innerHTML=`<div class="card"><h2>Unidades (${lista.length})</h2>
+   <div class="tw"><table><thead><tr><th>Unidade</th><th>Próximas idas</th><th class="n">Caravanas</th><th class="n">Pessoas</th></tr></thead><tbody>
+   ${lista.map(e=>`<tr><td>${bdg(e.tipo)}<b>${esc(e.unidade)}</b></td><td>${e.proximas.length?e.proximas.slice(0,4).map(p=>`<div style="white-space:nowrap">${br(p.data).slice(0,5)} · ${TN[p.turno]} · <span class="mut">${p.pessoas}</span></div>`).join('')+(e.proximas.length>4?`<span class="mut">+${e.proximas.length-4} mais</span>`:''):'<span class="mut">Nenhuma agendada</span>'}</td><td class="n">${e.caravanas}</td><td class="n">${e.pessoas}</td></tr>`).join('')||'<tr><td colspan="4" class="mut">Nenhuma unidade ainda. Adicione um líder na aba Líderes.</td></tr>'}
+   </tbody></table></div></div>`;
+}
+
+/* ---------- admin: líderes ---------- */
+async function viewLid(msg){
+  const lista=await api('/admin/lideres');
+  const el=$('#v-lid');
+  el.innerHTML=`<div class="card"><h2>Adicionar líder</h2>
+    <div class="row"><input id="ln" placeholder="Nome do líder"><select id="lt"><option value="estaca">Estaca</option><option value="ala">Ala</option></select><input id="lo" placeholder="Unidade padrão (ex.: Juiz de Fora)"></div>
+    <div class="row"><input id="lu" placeholder="Usuário de acesso"><input id="ls" type="password" placeholder="Senha (mín. 6)"><button class="p" id="lc">Adicionar</button></div>
+    <div id="am" class="mut" style="margin-top:8px">${msg||''}</div></div>
+   <div class="card"><h2>Líderes (${lista.length})</h2>
+    ${lista.map(e=>`<div class="li"><span><b>${esc(e.nome)}</b> · ${bdg(e.tipo)}${esc(e.origem)}<br><span class="mut" style="font-size:13px">usuário: ${esc(e.usuario)}</span></span>
+      <span><button class="sm" onclick="novaSenha(${e.id},'${esc(e.nome)}')">Redefinir senha</button> <button class="sm" onclick="remLider(${e.id},'${esc(e.nome)}')">Remover</button></span></div>`).join('')||'<div class="mut">Nenhum líder ainda.</div>'}</div>
+   <div class="card"><h2>Capacidade por turno</h2>
+    <div class="row"><input id="cp" type="number" min="1" placeholder="Atual: ${cal.capacidade_turno||'—'}"><button id="cc">Salvar</button></div>
+    <div class="mut" style="margin-top:8px;font-size:13px">Define as cores do calendário (verde até 60%, amarelo até 90%, vermelho acima).</div></div>`;
+  $('#lc').onclick=async()=>{try{await api('/admin/lideres',{method:'POST',body:JSON.stringify({nome:$('#ln').value,origem:$('#lo').value,tipo:$('#lt').value,usuario:$('#lu').value.trim(),senha:$('#ls').value})});viewLid('Líder adicionado.')}catch(e){$('#am').textContent=e.message}};
+  $('#cc').onclick=async()=>{try{await api('/admin/capacidade',{method:'PUT',body:JSON.stringify({capacidade_turno:+$('#cp').value})});cal=await api('/calendario?mes='+mesKey());viewLid('Capacidade atualizada.')}catch(e){$('#am').textContent=e.message}};
+}
+async function novaSenha(id,nome){const s=prompt('Nova senha para '+nome+' (mín. 6 caracteres):');if(!s)return;try{await api(`/admin/lideres/${id}/senha`,{method:'PUT',body:JSON.stringify({senha:s})});viewLid('Senha redefinida.')}catch(e){alert(e.message)}}
+async function remLider(id,nome){if(!confirm('Remover '+nome+' e todas as caravanas dele?'))return;try{await api('/admin/lideres/'+id,{method:'DELETE'});viewLid('Líder removido.')}catch(e){alert(e.message)}}
+
+/* ---------- admin: relatório ---------- */
+let rp={de:null,ate:null};
+async function viewRel(){
+  const y=ref.getFullYear(),m=ref.getMonth(),last=new Date(y,m+1,0).getDate();
+  rp.de=rp.de||`${mesKey()}-01`; rp.ate=rp.ate||`${mesKey()}-${pad(last)}`;
+  const el=$('#v-rel');
+  el.innerHTML=`<div class="card"><h2>Relatório do período</h2>
+   <div class="row"><input type="date" id="rd" value="${rp.de}"><input type="date" id="ra" value="${rp.ate}"><button class="p" id="rg">Gerar</button><button id="rc">Baixar CSV</button></div></div><div id="rbody"></div>`;
+  $('#rg').onclick=()=>{rp.de=$('#rd').value;rp.ate=$('#ra').value;viewRel()};
+  $('#rc').onclick=async()=>{try{
+    const r=await api(`/admin/relatorio.csv?de=${rp.de}&ate=${rp.ate}`,{},true);
+    const a=document.createElement('a');a.href=URL.createObjectURL(await r.blob());a.download=`relatorio_${rp.de}_${rp.ate}.csv`;a.click();
+  }catch(e){alert(e.message)}};
+  const r=await api(`/admin/relatorio?de=${rp.de}&ate=${rp.ate}`);
+  const max=Math.max(1,...r.por_estaca.map(e=>e.pessoas));
+  $('#rbody').innerHTML=`<div class="card"><div class="stats">
+    <div class="stat"><b>${r.total_caravanas}</b><span>Caravanas</span></div>
+    <div class="stat"><b>${r.total_pessoas}</b><span>Pessoas</span></div>
+    <div class="stat"><b>${r.com_investidura}</b><span>Com investidura</span></div>
+    <div class="stat"><b>${r.sem_investidura}</b><span>Sem investidura</span></div></div></div>
+   <div class="card"><h2>Por turno</h2><div class="stats">${['manha','tarde'].map(t=>`<div class="stat"><b>${r.por_turno[t].pessoas}</b><span>${TN[t]} · ${r.por_turno[t].com} com · ${r.por_turno[t].sem} sem</span></div>`).join('')}</div></div>
+   <div class="card"><h2>Por unidade</h2>${r.por_estaca.map(e=>`<div class="li" style="display:grid;grid-template-columns:130px 1fr 130px;gap:10px"><span>${esc(e.origem)}</span><div class="hbar" style="width:${e.pessoas/max*100}%"></div><span class="mut" style="text-align:right">${e.pessoas} (${e.com}c/${e.sem}s)</span></div>`).join('')||'<div class="mut">Sem dados no período.</div>'}</div>
+   <div class="card"><h2>Detalhe</h2><div class="tw"><table><thead><tr><th>Data</th><th>Turno</th><th>Unidade</th><th class="n">Com</th><th class="n">Sem</th><th class="n">Total</th></tr></thead><tbody>
+   ${r.linhas.map(l=>`<tr><td>${br(l.data)}</td><td>${TN[l.turno]}</td><td>${bdg(l.tipo)}${esc(l.origem)}</td><td class="n">${l.com}</td><td class="n">${l.sem}</td><td class="n"><b>${l.pessoas}</b></td></tr>`).join('')||'<tr><td colspan="6" class="mut">Sem dados.</td></tr>'}
+   </tbody></table></div></div>`;
+}
+
+/* ---------- líder ---------- */
+async function viewMin(){
+  const lista=await api('/minhas-caravanas');
+  $('#v-min').innerHTML=`<div class="card"><h2>Minhas caravanas — ${esc(sess.nome)}</h2>`+(lista.map(c=>
+   `<div class="li"><span><b>${br(c.data)}</b> · ${TN[c.turno]} · ${bdg(c.tipo_unidade)}${esc(c.unidade)} · ${c.pessoas} pessoas${c.transporte?' · '+esc(c.transporte):''}
+     <br><span class="mut" style="font-size:13px">${c.com_investidura} com investidura · ${c.sem_investidura} sem investidura</span></span>
+     <span><button class="sm" onclick='abrirForm(${JSON.stringify(c)})'>Editar</button> <button class="sm" onclick="apagar(${c.id})">Excluir</button></span></div>`).join('')||'<div class="mut">Nenhuma caravana ainda. Clique em um sábado do calendário para cadastrar.</div>')+'</div>';
+}
+function sabados(extra){
+  const out=[];const d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()+((6-d.getDay()+7)%7));
+  for(let i=0;i<20;i++){out.push(d.toISOString().slice(0,10));d.setDate(d.getDate()+7)}
+  if(extra&&!out.includes(extra))out.unshift(extra);return out;
+}
+async function abrirForm(c,d,t){
+  c=c||{};tab='min';await render();
+  const dt=c.data||d;
+  $('#v-min').insertAdjacentHTML('afterbegin',`<div class="card" id="fm"><h2>${c.id?'Editar':'Nova'} caravana</h2>
+   <div class="row"><select id="ftu"><option value="estaca">Estaca</option><option value="ala">Ala</option></select><input id="fu" placeholder="Nome da unidade" value="${esc(c.unidade||sess.origem)}"></div>
+   <div class="row"><select id="fd">${sabados(dt).map(x=>`<option value="${x}" ${x===dt?'selected':''}>Sábado ${br(x)}</option>`).join('')}</select>
+   <select id="ft"><option value="manha">Manhã</option><option value="tarde">Tarde</option></select>
+   <input id="ftr" placeholder="Ônibus, van..." value="${esc(c.transporte||'')}"></div>
+   <div class="row"><div style="flex:1 1 150px"><label class="mut" style="font-size:12px">Com investidura</label><input type="number" min="0" id="fc" style="width:100%" value="${c.com_investidura||''}"></div>
+   <div style="flex:1 1 150px"><label class="mut" style="font-size:12px">Sem investidura</label><input type="number" min="0" id="fs" style="width:100%" value="${c.sem_investidura||''}"></div></div>
+   <div class="row"><button class="p" id="sv">Salvar</button><button id="cx">Cancelar</button></div><div id="vg" style="margin-top:10px;font-weight:600"></div><div id="ferr" class="mut" style="margin-top:8px"></div></div>`);
+  $('#ft').value=c.turno||t||'manha';$('#ftu').value=c.tipo_unidade||sess.tipo||'estaca';
+  $('#cx').onclick=()=>render();
+  const mine=(c.pessoas||0);
+  const vagas=async()=>{try{
+    const dia=$('#fd').value,t=$('#ft').value;
+    const r=await api('/calendario?mes='+dia.slice(0,7));
+    const x=r.dias[dia]&&r.dias[dia][t];
+    const livre=r.capacidade_turno-(x?x.total:0)+(c.id&&c.data===dia&&c.turno===t?mine:0);
+    const pedido=(+$('#fc').value||0)+(+$('#fs').value||0);
+    $('#vg').innerHTML=`<span style="color:var(--${pedido>livre?'vermelho':'verde'})">Vagas disponíveis neste turno: ${Math.max(0,livre)}${pedido>livre?' — você informou '+pedido+', acima do limite':''}</span>`;
+    $('#sv').disabled=pedido>livre;
+  }catch(e){}};
+  ['fd','ft','fc','fs'].forEach(i=>$('#'+i).oninput=vagas);vagas();
+  $('#sv').onclick=async()=>{try{
+    const b={data:$('#fd').value,turno:$('#ft').value,com_investidura:+$('#fc').value||0,sem_investidura:+$('#fs').value||0,transporte:$('#ftr').value||null,tipo_unidade:$('#ftu').value,unidade:$('#fu').value.trim()||null};
+    await api(c.id?'/caravanas/'+c.id:'/caravanas',{method:c.id?'PUT':'POST',body:JSON.stringify(b)});
+    tab='min';render();
+  }catch(e){$('#ferr').textContent=e.message.replace(/^Value error, /,'')}};
+}
+async function apagar(id){if(confirm('Excluir esta caravana?')){await api('/caravanas/'+id,{method:'DELETE'});render()}}
+
+render();
+</script>
+</body>
+</html>
