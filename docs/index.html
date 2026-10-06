@@ -73,7 +73,7 @@ td{padding:9px 8px;border-bottom:1px solid var(--bd)}td.n,th.n{text-align:right}
 .hbar{height:8px;border-radius:4px;background:var(--ac2);min-width:2px}
 .ord{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;width:100%}
 .ord label{font-size:12px;color:var(--mut);display:block}.ord input{width:100%}
-#gate .row>*{flex:none}#gate{max-width:380px;margin:10vh 8vw 0 auto;padding:28px;background:rgba(255,255,255,.96);color:#212529}@media(prefers-color-scheme:dark){#gate{background:rgba(23,28,38,.94);color:#e8ebf2}}#gate .logo{font-family:var(--serif);font-size:12px;text-align:center;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut)}#gate h2{text-align:center;font:400 20px var(--serif);letter-spacing:2px;text-transform:uppercase;margin:6px 0 16px}
+#gate .row>*{flex:none}.pw{position:relative}.pw input{width:100%;padding-right:46px}.row>.pw{flex:1 1 150px}.eye{position:absolute;right:3px;top:50%;transform:translateY(-50%);border:0!important;background:transparent!important;padding:6px 10px;font-size:16px;opacity:.7}.eye:hover{opacity:1}#gate{max-width:380px;margin:10vh 8vw 0 auto;padding:28px;background:rgba(255,255,255,.96);color:#212529}@media(prefers-color-scheme:dark){#gate{background:rgba(23,28,38,.94);color:#e8ebf2}}#gate .logo{font-family:var(--serif);font-size:12px;text-align:center;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut)}#gate h2{text-align:center;font:400 20px var(--serif);letter-spacing:2px;text-transform:uppercase;margin:6px 0 16px}
 @media(max-width:900px){#gate{margin:8vh auto 0}}
 @media(max-width:560px){.bar{font-size:0}.day{min-height:56px;padding:4px}.tab{padding:8px 11px}}
 </style>
@@ -100,7 +100,7 @@ td{padding:9px 8px;border-bottom:1px solid var(--bd)}td.n,th.n{text-align:right}
   <div class="logo">Templo de Rio de Janeiro Brasil</div><h2>Agenda de caravanas</h2>
   <div class="row" style="flex-direction:column">
     <input id="u" placeholder="Usuário" autocomplete="username">
-    <input id="s" type="password" placeholder="Senha" autocomplete="current-password">
+    <div class="pw"><input id="s" type="password" placeholder="Senha" autocomplete="current-password"><button type="button" class="eye" title="Mostrar/ocultar senha" aria-label="Mostrar ou ocultar a senha">👁</button></div>
     <button class="p" id="go">Entrar</button>
   </div>
   <div id="err" class="mut" style="margin-top:10px;text-align:center"></div>
@@ -206,7 +206,7 @@ async function rota(m,p,q,b){
     return Object.values(out).map(u=>({...u,proximas:u.proximas.sort((a,c)=>(a.data+a.turno).localeCompare(c.data+c.turno))})).sort((a,c)=>(a.tipo+a.unidade).localeCompare(c.tipo+c.unidade));
   }
   if(m==='POST'&&p==='/admin/lideres'){
-    const tmp=supabase.createClient(window.SUPABASE_URL,window.SUPABASE_ANON_KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
+    const tmp=supabase.createClient(window.SUPABASE_URL,window.SUPABASE_ANON_KEY,{auth:{storageKey:'sb-tmp-signup',persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
     const usuario=String(b.usuario||'').trim().toLowerCase();
     if(!/^[a-z0-9._-]{2,30}$/.test(usuario))throw new Error('Usuário: use 2 a 30 letras minúsculas, números, ponto, hífen ou _ (sem espaços)');
     if((b.senha||'').length<6)throw new Error('A senha precisa ter ao menos 6 caracteres');
@@ -257,6 +257,7 @@ async function doLogin(){try{
   const r=await api('/login',{method:'POST',body:JSON.stringify({usuario:$('#u').value.trim(),senha:$('#s').value})});
   $('#s').value='';$('#err').textContent='';sess=r;localStorage.setItem('sess',JSON.stringify(r));tab='manha';render();
 }catch(e){$('#err').textContent=e.message}}
+document.addEventListener('click',e=>{const b=e.target.closest('.eye');if(!b)return;const i=b.parentElement.querySelector('input');const ver=i.type==='password';i.type=ver?'text':'password';b.textContent=ver?'🙈':'👁'});
 $('#go').onclick=doLogin;
 $('#s').onkeydown=e=>{if(e.key==='Enter')doLogin()};
 
@@ -315,7 +316,7 @@ async function viewLid(msg){
   const el=$('#v-lid');
   el.innerHTML=`<div class="card"><h2>Adicionar líder</h2>
     <div class="row"><input id="ln" placeholder="Nome do líder"><select id="lt"><option value="estaca">Estaca</option><option value="ala">Ala</option></select><input id="lo" placeholder="Unidade padrão (ex.: Juiz de Fora)"></div>
-    <div class="row"><input id="lu" placeholder="Usuário de acesso"><input id="ls" type="password" placeholder="Senha (mín. 6)"><button class="p" id="lc">Adicionar</button></div>
+    <div class="row"><input id="lu" placeholder="Usuário de acesso"><div class="pw"><input id="ls" type="password" placeholder="Senha (mín. 6)"><button type="button" class="eye" title="Mostrar/ocultar senha" aria-label="Mostrar ou ocultar a senha">👁</button></div><button class="p" id="lc">Adicionar</button></div>
     <div id="am" class="mut" style="margin-top:8px">${msg||''}</div></div>
    <div class="card"><h2>Líderes (${lista.length})</h2>
     ${lista.map(e=>`<div class="li"><span><b>${esc(e.nome)}</b> · ${bdg(e.tipo)}${esc(e.origem)}<br><span class="mut" style="font-size:13px">usuário: ${esc(e.usuario)}</span></span>
