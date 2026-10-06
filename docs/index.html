@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Caravanas do Templo</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Cormorant+Garamond:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
 <style>
 :root{--foto:url('https://content.churchofjesuschrist.org/templesldsorg/bc/Temples/photo-galleries/rio-de-janeiro-brazil/1280x800/1-001db7326e638032470a02813c9e47191ef74b0e.jpeg');--foto2:url('https://content.churchofjesuschrist.org/templesldsorg/bc/Temples/photo-galleries/rio-de-janeiro-brazil/1280x800/4-5aa85fb6f20a17f629302687710142328a707d4d.jpeg');--bg:#f4f5f7;--card:rgba(255,255,255,.72);--solid:#fff;--tx:#212529;--mut:#6c737b;--bd:#e3e6ea;--gold:#a39e72;--ac:#6b6638;--ac2:#a39e72;--soft:#f1efe3;--serif:'Cinzel','Trajan Pro',Georgia,serif;
@@ -145,16 +147,93 @@ const nomeMes=()=>{const t=ref.toLocaleDateString('pt-BR',{month:'long',year:'nu
 const isAdmin=()=>sess&&sess.role==='admin';
 const bdg=t=>`<span class="badge ${t}">${t==='ala'?'Ala':'Estaca'}</span>`;
 
+/* ---------- Supabase (substitui o antigo servidor) ---------- */
+const CONFIG_OK=window.SUPABASE_URL&&!window.SUPABASE_URL.includes('COLE');
+const sb=CONFIG_OK?supabase.createClient(window.SUPABASE_URL,window.SUPABASE_ANON_KEY):null;
+const emailDe=u=>String(u||'').trim().toLowerCase()+'@caravanas.app';
+const unwrap=r=>{if(r.error)throw new Error(r.error.message||'Erro');return r.data};
+const lvl=(t,cap)=>t===0?'vazio':(t/cap<.6?'verde':t/cap<.9?'amarelo':'vermelho');
+const hoje=()=>{const d=new Date();return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`};
+async function uid(){const {data}=await sb.auth.getUser();return data.user&&data.user.id}
+
 async function api(path,opt={},raw){
-  const h={'Content-Type':'application/json'};
-  if(sess)h.Authorization='Bearer '+sess.token;
-  const r=await fetch('/api'+path,{...opt,headers:h});
-  if(!r.ok){
-    const j=await r.json().catch(()=>({}));
-    if(r.status===401&&sess){sess=null;localStorage.removeItem('sess');render()}
-    throw new Error(typeof j.detail==='string'?j.detail:(Array.isArray(j.detail)&&j.detail[0]?String(j.detail[0].msg).replace(/^Value error, /,''):'Dados inválidos'));
+  if(!sb)throw new Error('Configure docs/config.js com a URL e a chave do Supabase.');
+  const body=opt.body?JSON.parse(opt.body):null, method=(opt.method||'GET').toUpperCase();
+  const [p,qs]=path.split('?'), q=new URLSearchParams(qs||'');
+  try{return await rota(method,p,q,body)}
+  catch(e){
+    if(sess&&/JWT|Sessão inválida|not authenticated/i.test(e.message)){sess=null;localStorage.removeItem('sess');render()}
+    throw e;
   }
-  return raw?r:r.json();
+}
+
+async function capacidade(){return +unwrap(await sb.from('config').select('valor').eq('chave','capacidade_turno').single()).valor}
+
+async function rota(m,p,q,b){
+  let mt;
+  if(m==='POST'&&p==='/login'){
+    const r=await sb.auth.signInWithPassword({email:emailDe(b.usuario),password:b.senha});
+    if(r.error)throw new Error('Usuário ou senha incorretos');
+    const pf=unwrap(await sb.from('perfis').select('*').eq('id',r.data.user.id).single());
+    return {role:pf.role,nome:pf.nome,origem:pf.origem,tipo:pf.tipo};
+  }
+  if(m==='GET'&&p==='/calendario'){
+    const [cap,rows]=await Promise.all([capacidade(),sb.rpc('calendario_mes',{p_mes:q.get('mes')}).then(unwrap)]);
+    const dias={};
+    for(const r of rows){
+      const d=dias[r.data]=dias[r.data]||{manha:{total:0,com:0,sem:0,caravanas:[]},tarde:{total:0,com:0,sem:0,caravanas:[]}};
+      const t=d[r.turno];t.total+=r.pessoas;t.com+=r.com;t.sem+=r.sem;
+      t.caravanas.push({origem:r.unidade,tipo:r.tipo,pessoas:r.pessoas,com:r.com,sem:r.sem,transporte:r.transporte});
+    }
+    for(const d of Object.values(dias))for(const t of ['manha','tarde']){d[t].nivel=lvl(d[t].total,cap);d[t].vagas=Math.max(0,cap-d[t].total)}
+    return {mes:q.get('mes'),capacidade_turno:cap,dias};
+  }
+  if(m==='GET'&&p==='/minhas-caravanas')
+    return unwrap(await sb.from('caravanas').select('*').eq('lider_id',await uid()).order('data'));
+  if(p==='/caravanas'||(mt=p.match(/^\/caravanas\/(\d+)$/))){
+    if(m==='DELETE'){unwrap(await sb.rpc('apagar_caravana',{p_id:+mt[1]}));return {ok:true}}
+    const id=unwrap(await sb.rpc('salvar_caravana',{p_id:mt?+mt[1]:null,p_data:b.data,p_turno:b.turno,p_com:b.com_investidura,p_sem:b.sem_investidura,p_transporte:b.transporte,p_tipo:b.tipo_unidade,p_unidade:b.unidade}));
+    return {id};
+  }
+  if(m==='GET'&&p==='/admin/lideres')
+    return unwrap(await sb.from('perfis').select('id,nome,origem,tipo,usuario').eq('role','lider').order('origem'));
+  if(m==='GET'&&p==='/admin/unidades'){
+    const [ls,cs]=await Promise.all([api('/admin/lideres'),sb.from('caravanas').select('data,turno,pessoas,unidade,tipo_unidade').then(unwrap)]);
+    const out={};
+    for(const c of cs){const k=c.tipo_unidade+'|'+c.unidade;const u=out[k]=out[k]||{tipo:c.tipo_unidade,unidade:c.unidade,caravanas:0,pessoas:0,proximas:[]};
+      u.caravanas++;u.pessoas+=c.pessoas;if(c.data>=hoje())u.proximas.push({data:c.data,turno:c.turno,pessoas:c.pessoas})}
+    for(const l of ls){const k=l.tipo+'|'+l.origem;out[k]=out[k]||{tipo:l.tipo,unidade:l.origem,caravanas:0,pessoas:0,proximas:[]}}
+    return Object.values(out).map(u=>({...u,proximas:u.proximas.sort((a,c)=>(a.data+a.turno).localeCompare(c.data+c.turno))})).sort((a,c)=>(a.tipo+a.unidade).localeCompare(c.tipo+c.unidade));
+  }
+  if(m==='POST'&&p==='/admin/lideres'){
+    const tmp=supabase.createClient(window.SUPABASE_URL,window.SUPABASE_ANON_KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
+    const usuario=String(b.usuario||'').trim().toLowerCase();
+    if(!/^[a-z0-9._-]{2,30}$/.test(usuario))throw new Error('Usuário: use 2 a 30 letras minúsculas, números, ponto, hífen ou _ (sem espaços)');
+    if((b.senha||'').length<6)throw new Error('A senha precisa ter ao menos 6 caracteres');
+    const r=await tmp.auth.signUp({email:emailDe(usuario),password:b.senha});
+    if(r.error)throw new Error(/registered|already/i.test(r.error.message)?'Usuário já existe':r.error.message);
+    if(!r.data.user)throw new Error('Não foi possível criar o login');
+    const e=(await sb.rpc('criar_perfil',{p_id:r.data.user.id,p_nome:b.nome,p_usuario:usuario,p_origem:b.origem,p_tipo:b.tipo})).error;
+    if(e){await sb.rpc('descartar_login_sem_perfil',{p_id:r.data.user.id});throw new Error(e.message)}
+    return {id:r.data.user.id};
+  }
+  if(m==='PUT'&&(mt=p.match(/^\/admin\/lideres\/([\w-]+)\/senha$/))){unwrap(await sb.rpc('redefinir_senha',{p_id:mt[1],p_senha:b.senha}));return {ok:true}}
+  if(m==='DELETE'&&(mt=p.match(/^\/admin\/lideres\/([\w-]+)$/))){unwrap(await sb.rpc('remover_lider',{p_id:mt[1]}));return {ok:true}}
+  if(m==='PUT'&&p==='/admin/capacidade'){unwrap(await sb.rpc('definir_capacidade',{p_cap:b.capacidade_turno}));return {capacidade_turno:b.capacidade_turno}}
+  if(m==='GET'&&p==='/admin/relatorio'){
+    const rows=unwrap(await sb.from('caravanas').select('*, perfis(nome)').gte('data',q.get('de')).lte('data',q.get('ate')).order('data').order('turno'));
+    const por={},turno={manha:{pessoas:0,com:0,sem:0},tarde:{pessoas:0,com:0,sem:0}};
+    for(const r of rows){
+      const e=por[r.unidade]=por[r.unidade]||{origem:r.unidade,tipo:r.tipo_unidade,caravanas:0,pessoas:0,com:0,sem:0};
+      e.caravanas++;
+      for(const d of [e,turno[r.turno]]){d.pessoas+=r.pessoas;d.com+=r.com_investidura;d.sem+=r.sem_investidura}
+    }
+    return {de:q.get('de'),ate:q.get('ate'),total_caravanas:rows.length,total_pessoas:rows.reduce((a,r)=>a+r.pessoas,0),
+      com_investidura:rows.reduce((a,r)=>a+r.com_investidura,0),sem_investidura:rows.reduce((a,r)=>a+r.sem_investidura,0),
+      por_estaca:Object.values(por).sort((a,c)=>c.pessoas-a.pessoas),por_turno:turno,
+      linhas:rows.map(r=>({data:r.data,turno:r.turno,origem:r.unidade,tipo:r.tipo_unidade,lider:r.perfis&&r.perfis.nome,pessoas:r.pessoas,com:r.com_investidura,sem:r.sem_investidura,transporte:r.transporte}))};
+  }
+  throw new Error('Rota desconhecida: '+m+' '+p);
 }
 
 /* ---------- shell ---------- */
@@ -165,7 +244,7 @@ function render(){
   document.body.classList.toggle('login',!sess);
   $('#auth').innerHTML=sess?`<span>${esc(isAdmin()?'Administrador':sess.origem)}</span><button id="out" class="sm">Sair</button>`:'';
   if(!sess)return;
-  $('#out').onclick=()=>{sess=null;sel=null;tab='manha';localStorage.removeItem('sess');render()};
+  $('#out').onclick=async()=>{if(sb)await sb.auth.signOut();sess=null;sel=null;tab='manha';localStorage.removeItem('sess');render()};
   const tabs=[['manha','☀️ Manhã'],['tarde','🌙 Tarde'],...(isAdmin()?[['est','Unidades'],['rel','Relatório'],['lid','Líderes']]:[['min','Minhas caravanas']])];
   $('#tabs').innerHTML=tabs.map(([k,n])=>`<button class="tab ${k===tab?'on':''}" data-t="${k}">${n}</button>`).join('');
   document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{tab=b.dataset.t;render()});
@@ -260,8 +339,10 @@ async function viewRel(){
    <div class="row"><input type="date" id="rd" value="${rp.de}"><input type="date" id="ra" value="${rp.ate}"><button class="p" id="rg">Gerar</button><button id="rc">Baixar CSV</button></div></div><div id="rbody"></div>`;
   $('#rg').onclick=()=>{rp.de=$('#rd').value;rp.ate=$('#ra').value;viewRel()};
   $('#rc').onclick=async()=>{try{
-    const r=await api(`/admin/relatorio.csv?de=${rp.de}&ate=${rp.ate}`,{},true);
-    const a=document.createElement('a');a.href=URL.createObjectURL(await r.blob());a.download=`relatorio_${rp.de}_${rp.ate}.csv`;a.click();
+    const r=await api(`/admin/relatorio?de=${rp.de}&ate=${rp.ate}`);
+    const cel=v=>`"${String(v??'').replace(/"/g,'""')}"`;
+    const csv=['data,turno,tipo,unidade,lider,pessoas,com_investidura,sem_investidura,transporte',...r.linhas.map(l=>[l.data,l.turno,l.tipo,l.origem,l.lider,l.pessoas,l.com,l.sem,l.transporte].map(cel).join(','))].join('\n');
+    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));a.download=`relatorio_${rp.de}_${rp.ate}.csv`;a.click();
   }catch(e){alert(e.message)}};
   const r=await api(`/admin/relatorio?de=${rp.de}&ate=${rp.ate}`);
   const max=Math.max(1,...r.por_estaca.map(e=>e.pessoas));
@@ -322,7 +403,11 @@ async function abrirForm(c,d,t){
 }
 async function apagar(id){if(confirm('Excluir esta caravana?')){await api('/caravanas/'+id,{method:'DELETE'});render()}}
 
-render();
+(async()=>{
+  if(!CONFIG_OK){$('#err').textContent='Falta configurar docs/config.js (URL e chave do Supabase).'}
+  else{const {data}=await sb.auth.getSession();if(!data.session){sess=null;localStorage.removeItem('sess')}}
+  render();
+})();
 </script>
 </body>
 </html>
