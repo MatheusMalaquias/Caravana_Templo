@@ -150,7 +150,8 @@ const bdg=t=>`<span class="badge ${t}">${t==='ala'?'Ala':'Estaca'}</span>`;
 /* ---------- Supabase (substitui o antigo servidor) ---------- */
 const CONFIG_OK=window.SUPABASE_URL&&!window.SUPABASE_URL.includes('COLE');
 const sb=CONFIG_OK?supabase.createClient(window.SUPABASE_URL,window.SUPABASE_ANON_KEY):null;
-const emailDe=u=>String(u||'').trim().toLowerCase()+'@caravanas.app';
+const normUsuario=u=>String(u||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase().replace(/\s+/g,'.');
+const emailDe=u=>normUsuario(u)+'@caravanas.app';
 const unwrap=r=>{if(r.error)throw new Error(r.error.message||'Erro');return r.data};
 const lvl=(t,cap)=>t===0?'vazio':(t/cap<.6?'verde':t/cap<.9?'amarelo':'vermelho');
 const hoje=()=>{const d=new Date();return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`};
@@ -207,15 +208,15 @@ async function rota(m,p,q,b){
   }
   if(m==='POST'&&p==='/admin/lideres'){
     const tmp=supabase.createClient(window.SUPABASE_URL,window.SUPABASE_ANON_KEY,{auth:{storageKey:'sb-tmp-signup',persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
-    const usuario=String(b.usuario||'').trim().toLowerCase();
-    if(!/^[a-z0-9._-]{2,30}$/.test(usuario))throw new Error('Usuário: use 2 a 30 letras minúsculas, números, ponto, hífen ou _ (sem espaços)');
+    const usuario=normUsuario(b.usuario);
+    if(!/^[a-z0-9._-]{2,30}$/.test(usuario))throw new Error('Usuário inválido: use de 2 a 30 caracteres entre letras, números, ponto, hífen ou _ (sem símbolos como @ # $ /)');
     if((b.senha||'').length<6)throw new Error('A senha precisa ter ao menos 6 caracteres');
     const r=await tmp.auth.signUp({email:emailDe(usuario),password:b.senha});
     if(r.error)throw new Error(/registered|already/i.test(r.error.message)?'Usuário já existe':r.error.message);
     if(!r.data.user)throw new Error('Não foi possível criar o login');
     const e=(await sb.rpc('criar_perfil',{p_id:r.data.user.id,p_nome:b.nome,p_usuario:usuario,p_origem:b.origem,p_tipo:b.tipo})).error;
     if(e){await sb.rpc('descartar_login_sem_perfil',{p_id:r.data.user.id});throw new Error(e.message)}
-    return {id:r.data.user.id};
+    return {id:r.data.user.id,usuario};
   }
   if(m==='PUT'&&(mt=p.match(/^\/admin\/lideres\/([\w-]+)\/senha$/))){unwrap(await sb.rpc('redefinir_senha',{p_id:mt[1],p_senha:b.senha}));return {ok:true}}
   if(m==='DELETE'&&(mt=p.match(/^\/admin\/lideres\/([\w-]+)$/))){unwrap(await sb.rpc('remover_lider',{p_id:mt[1]}));return {ok:true}}
@@ -324,7 +325,7 @@ async function viewLid(msg){
    <div class="card"><h2>Capacidade por turno</h2>
     <div class="row"><input id="cp" type="number" min="1" placeholder="Atual: ${cal.capacidade_turno||'—'}"><button id="cc">Salvar</button></div>
     <div class="mut" style="margin-top:8px;font-size:13px">Define as cores do calendário (verde até 60%, amarelo até 90%, vermelho acima).</div></div>`;
-  $('#lc').onclick=async()=>{try{await api('/admin/lideres',{method:'POST',body:JSON.stringify({nome:$('#ln').value,origem:$('#lo').value,tipo:$('#lt').value,usuario:$('#lu').value.trim(),senha:$('#ls').value})});viewLid('Líder adicionado.')}catch(e){$('#am').textContent=e.message}};
+  $('#lc').onclick=async()=>{try{const r=await api('/admin/lideres',{method:'POST',body:JSON.stringify({nome:$('#ln').value,origem:$('#lo').value,tipo:$('#lt').value,usuario:$('#lu').value,senha:$('#ls').value})});viewLid('Líder adicionado. Usuário de acesso: '+r.usuario)}catch(e){$('#am').textContent=e.message}};
   $('#cc').onclick=async()=>{try{await api('/admin/capacidade',{method:'PUT',body:JSON.stringify({capacidade_turno:+$('#cp').value})});cal=await api('/calendario?mes='+mesKey());viewLid('Capacidade atualizada.')}catch(e){$('#am').textContent=e.message}};
 }
 async function novaSenha(id,nome){const s=prompt('Nova senha para '+nome+' (mín. 6 caracteres):');if(!s)return;try{await api(`/admin/lideres/${id}/senha`,{method:'PUT',body:JSON.stringify({senha:s})});viewLid('Senha redefinida.')}catch(e){alert(e.message)}}
